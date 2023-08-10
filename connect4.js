@@ -4,12 +4,13 @@
  * column until a player gets four-in-a-row (horiz, vert, or diag) or until
  * board fills (tie)
  */
-class Game {
+ class Game {
   constructor(WIDTH = 7, HEIGHT = 6,currPlayer = 1) {
     this.width = WIDTH;
     this.height = HEIGHT;
     this.currPlayer = currPlayer;
     this.board = [];
+    this.htmlBoard = document.getElementById('board');
   }
 
   makeBoard() {
@@ -19,7 +20,7 @@ class Game {
   }
 
   makeHtmlBoard() {
-    const board = document.getElementById('board');
+    // const board = document.getElementById('board'); // Trying to add this variable to the object instead.
 
     // make column tops (clickable area for adding a piece to that column)
     const top = document.createElement('tr');
@@ -28,11 +29,12 @@ class Game {
     for (let x = 0; x < this.width; x++) {
       const headCell = document.createElement('td');
       headCell.setAttribute('id', x);
-      headCell.addEventListener('click', handleClick);
+
+      headCell.addEventListener('click', this.handleClick);
       top.append(headCell);
     }
 
-    board.append(top);
+    this.htmlBoard.append(top);
 
     // make main part of board
     for (let y = 0; y < this.height; y++) {
@@ -44,7 +46,7 @@ class Game {
         row.append(cell);
       }
 
-      board.append(row);
+      this.htmlBoard.append(row);
     }
   }
 
@@ -62,7 +64,7 @@ class Game {
   placeInTable(y, x) {
     const piece = document.createElement('div');
     piece.classList.add('piece');
-    piece.classList.add(`p${currPlayer}`);
+    piece.classList.add(`p${this.currPlayer}`);
 
     const spot = document.getElementById(`c-${y}-${x}`);
     spot.append(piece);
@@ -81,23 +83,26 @@ class Game {
     const x = +evt.target.id;
 
     // get next spot in column (if none, ignore click)
-    const y = findSpotForCol(x);
+    console.log(x);
+    debugger;
+    const y = this.findSpotForCol(x);
     if (y === null) {
       return;
     }
+    debugger;
 
     // place piece in board and add to HTML table
-    this.board[y][x] = currPlayer;
-    placeInTable(y, x);
+    this.board[y][x] = this.currPlayer;
+    this.placeInTable(y, x);
 
     // check for win
-    if (checkForWin()) {
-      return endGame(`Player ${currPlayer} won!`);
+    if (this.checkForWin()) {
+      return this.endGame(`Player ${this.currPlayer} won!`);
     }
 
     // check for tie
     if (this.board.every(row => row.every(cell => cell))) {
-      return endGame('Tie!');
+      return this.endGame('Tie!');
     }
 
     // switch players
@@ -107,7 +112,7 @@ class Game {
 /** checkForWin: check board cell-by-cell for "does a win start here?" */
 
 checkForWin() {
-  _win(cells) {
+  function _win(cells) {
     // Check four cells to see if they're all color of current player
     //  - cells: list of four (y, x) cells
     //  - returns true if all are legal coordinates & all match currPlayer
@@ -139,54 +144,11 @@ checkForWin() {
   }
 }
 
-makeBoard();
-makeHtmlBoard();
-  }
-
-
-const WIDTH = 7;
-const HEIGHT = 6;
-
-let currPlayer = 1; // active player: 1 or 2
-let board = []; // array of rows, each row is array of cells  (board[y][x])
-
-/** makeBoard: create in-JS board structure:
- *   board = array of rows, each row is array of cells  (board[y][x])
- */
-
-
-
-/** makeHtmlBoard: make HTML table and row of column tops. */
-
-function makeHtmlBoard() {
-  const board = document.getElementById('board');
-
-  // make column tops (clickable area for adding a piece to that column)
-  const top = document.createElement('tr');
-  top.setAttribute('id', 'column-top');
-
-  for (let x = 0; x < WIDTH; x++) {
-    const headCell = document.createElement('td');
-    headCell.setAttribute('id', x);
-    headCell.addEventListener('click', handleClick);
-    top.append(headCell);
-  }
-
-  board.append(top);
-
-  // make main part of board
-  for (let y = 0; y < HEIGHT; y++) {
-    const row = document.createElement('tr');
-
-    for (let x = 0; x < WIDTH; x++) {
-      const cell = document.createElement('td');
-      cell.setAttribute('id', `c-${y}-${x}`);
-      row.append(cell);
-    }
-
-    board.append(row);
-  }
+// Removed - want to do this outside of the object.
+// makeBoard();
+// makeHtmlBoard();
 }
 
-/** findSpotForCol: given column x, return top empty y (null if filled) */
-
+const game1 = new Game(7, 6);
+game1.makeBoard();
+game1.makeHtmlBoard();
